@@ -5,9 +5,9 @@ export interface Insurance {
 
 export class VehicleEntity {
     constructor(
+        public id: string,
         public color: string,
         public economicNumber: string,
-        public id: string,
         public insurance: Insurance,
         public licensePlates: string,
         public manufacturer: string,

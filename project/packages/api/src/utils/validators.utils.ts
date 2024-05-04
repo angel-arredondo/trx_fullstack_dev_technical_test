@@ -10,4 +10,7 @@ export class Validators {
     static get licensePlates(){
         return /^[A-Z0-9]{4,7}$/g
     }
+    static get numeric(){
+        return /^[0-9]$/g
+    }
 }

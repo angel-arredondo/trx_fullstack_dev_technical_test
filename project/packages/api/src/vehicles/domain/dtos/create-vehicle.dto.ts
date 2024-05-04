@@ -56,7 +56,7 @@ export class CreateVehicleDto {
 
         if(!licensePlates) return ["Missing license plates"];
         if(typeof licensePlates != "string") return ["License plates must be string"];
-        licensePlates = licensePlates.trim();
+        licensePlates = licensePlates.trim().toUpperCase();
         if(!Validators.licensePlates.test(licensePlates))
             return ["License plate is not valid "];
 
@@ -78,7 +78,7 @@ export class CreateVehicleDto {
 
         if(!vin) return ["Missing VIN"];
         if(typeof vin != "string") return ["VIN must be string"];
-        vin = vin.trim();
+        vin = vin.trim().toUpperCase();
         if(!Validators.vin.test(vin.trim())) return ["VIN is invalid"];
 
         const maxYear = new Date().getFullYear() + 1;

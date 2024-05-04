@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import { CreateVehicleDto, VehicleRepository } from "../../../vehicles/domain";
 import { CreateVehicleUseCase } from "../../../vehicles/use-cases/create-vehicle.use.case";
 import { CustomError } from "../../../utils/custom-error.util";
+import { GetAllVehiclesUseCase } from "../../../vehicles/use-cases/get-all-vehicles.use-case";
+import { GetAllVehiclesDto } from "../../../vehicles/domain/dtos/get-all-vehicles.dto";
 
 export class VehicleController {
     constructor(
@@ -28,7 +30,13 @@ export class VehicleController {
             .catch(error => this.handleError(error, res));
     }
 
-    getAllVehicles = (_req: Request, res: Response) => {
-        return res.status(200).json("get")
+    getAllVehicles = (req: Request, res: Response) => {
+        const [error, getAllVehiclesDto] = GetAllVehiclesDto.create(req.query);
+        if(error) return res.status(400).json({ error });
+
+        new GetAllVehiclesUseCase(this.vehicleRepository)
+            .execute(getAllVehiclesDto!)
+            .then(result => res.status(200).json(result))
+            .catch(error => this.handleError(error, res));
     }
 }

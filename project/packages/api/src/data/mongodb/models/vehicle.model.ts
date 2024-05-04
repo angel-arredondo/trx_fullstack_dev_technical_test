@@ -1,4 +1,5 @@
-import mongoose, {Schema} from "mongoose";
+import { Schema, model } from "mongoose";
+
 
 const insuranceSchema = new Schema({
     number:{
@@ -10,6 +11,8 @@ const insuranceSchema = new Schema({
         require: [true, 'Insurance carrier is required']
     }
 }, { _id : false })
+
+
 
 const vehicleSchema = new Schema({
     color:{
@@ -27,7 +30,8 @@ const vehicleSchema = new Schema({
     },
     licensePlates:{
          type: String,
-         require: [true, 'License plate is required']
+         require: [true, 'License plate is required'],
+         unique: true
     },
     manufacturer:{
         type: String,
@@ -52,4 +56,8 @@ const vehicleSchema = new Schema({
     }
 })
 
-export const VehicleModel = mongoose.model('Vehicle',vehicleSchema);
+
+
+
+// export const VehicleModel: Pagination<VehicleEntity> = model<VehicleEntity, Pagination<VehicleEntity>>("Vehicle", vehicleSchema)
+export const VehicleModel = model('Vehicle',vehicleSchema);
