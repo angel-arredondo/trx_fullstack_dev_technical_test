@@ -1,4 +1,6 @@
+import { routes } from "../../../data/mocks/routes.mock";
 import { Validators } from "../../../utils/validators.utils";
+import type { status as vehicleStatus } from "../entities/vehicle.entity";
 
 export class CreateVehicleDto {
     private constructor(
@@ -11,7 +13,9 @@ export class CreateVehicleDto {
         public licensePlates: string,
         public manufacturer: string,
         public model: string,
+        public position: number[],
         public seats: number,
+        public status: vehicleStatus,
         public vin: string,
         public year: number,
     ) { }
@@ -29,7 +33,7 @@ export class CreateVehicleDto {
             vin,
             year
         } = object;
-
+        
         if(!color) return ["Missing color"];
         if(typeof color != "string") return ["Color must be string"];
         if(color.length < 3) return ["Color is too short"];
@@ -42,17 +46,19 @@ export class CreateVehicleDto {
             economicNumber = economicNumber.trim();
         }
 
-        if(!insuranceCarrier) return ["Missing insurance carrier"];
-        if(typeof insuranceCarrier != "string") 
-            return ["Insurance carrier must be string"];
-        insuranceCarrier = insuranceCarrier.trim();
-        if(insuranceCarrier.length < 2) return ["Insurance carrier is too short"];
+        if(insuranceCarrier){
+            if(typeof insuranceCarrier != "string") 
+                return ["Insurance carrier must be string"];
+            insuranceCarrier = insuranceCarrier.trim();
+            if(insuranceCarrier.length < 2) return ["Insurance carrier is too short"];
+        }
 
-        if(!insuranceNumber) return ["Missing insurance number"];
-        if(typeof insuranceNumber != "string") 
-            return ["Insurance number must be string"];
-        insuranceNumber = insuranceNumber.trim();
-        if(insuranceNumber.length < 2) return ["Insurance number is too short"];
+        if(insuranceNumber){
+            if(typeof insuranceNumber != "string") 
+                return ["Insurance number must be string"];
+            insuranceNumber = insuranceNumber.trim();
+            if(insuranceNumber.length < 2) return ["Insurance number is too short"];
+        }
 
         if(!licensePlates) return ["Missing license plates"];
         if(typeof licensePlates != "string") return ["License plates must be string"];
@@ -70,11 +76,20 @@ export class CreateVehicleDto {
         if(typeof model != "string") 
             return ["Model must be string"];
         model = model.trim();
-        if(model.length < 2) return ["Model is too short"];
+        if(model.length < 1) return ["Model is too short"];
+
+        const position = routes[Math.floor(Math.random()*5)].coordinates[Math.floor(Math.random()*15)];
 
         if(!seats) return ["Missing seats"];
         if(typeof seats != "number") return ["Seats must be number"];
         if(seats < 1) return ["Seats must be greater than zero"];
+
+        const status = [
+            "avanzando",
+            "detenido",
+            "apagado",
+            "encendido"
+        ][Math.floor(Math.random()*4)];
 
         if(!vin) return ["Missing VIN"];
         if(typeof vin != "string") return ["VIN must be string"];
@@ -99,7 +114,9 @@ export class CreateVehicleDto {
             licensePlates,
             manufacturer,
             model,
+            position,
             seats,
+            status as vehicleStatus,
             vin,
             year
         )]

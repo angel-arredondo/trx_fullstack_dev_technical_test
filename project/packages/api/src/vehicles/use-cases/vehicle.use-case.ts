@@ -1,15 +1,16 @@
-import { PaginationModel } from "mongoose-paginate-ts";
 import { CreateVehicleDto, PaginationVehicle, VehicleEntity } from "../domain";
 import { GetAllVehiclesDto } from "../domain/dtos/get-all-vehicles.dto";
-// import { Vehicle } from "../../data/mongodb/models/vehicle.model";
+import { PutDeleteVehicleDto } from "../domain/dtos/put-delete-vehicle.dto";
 
-export interface newVehicle {
-    manufacturer: string;
-    vin: string;
-}
 
 export abstract class VehicleUseCase {
+    /**
+     * Executes a `vehicle` use case
+     * @param vehicleDto crud params
+     * @param createVehicleDto `vehicle` properties
+     */
     abstract execute(
-        vehicleDto: CreateVehicleDto | GetAllVehiclesDto
-    ): Promise<newVehicle | PaginationVehicle>;
+        vehicleDto: CreateVehicleDto | GetAllVehiclesDto |  PutDeleteVehicleDto,
+        createVehicleDto?: CreateVehicleDto
+    ): Promise<VehicleEntity | PaginationVehicle | void>;
 }

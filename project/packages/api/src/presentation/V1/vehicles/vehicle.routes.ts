@@ -13,6 +13,8 @@ export class VehicleRoutes {
 
         router.post('/create', vehicleController.createVehicle);
         router.get('/', vehicleController.getAllVehicles);
+        router.put('/:id', vehicleController.putVehicle);
+        router.delete('/:id', vehicleController.deleteVehicle);
 
         return router;
     }
