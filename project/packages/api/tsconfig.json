@@ -3,6 +3,11 @@
       "target": "ES6",
       "esModuleInterop": true,
       "module": "CommonJS",
-      "strict": true
+      "strict": true,
+      "jsx": "react",
+      "rootDir": "src",
+      "outDir": "./build",
+      "forceConsistentCasingInFileNames": true, 
+      "skipLibCheck": true  
     }
 }
