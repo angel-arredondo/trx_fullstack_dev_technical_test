@@ -1,18 +1,15 @@
 import { Schema, model } from "mongoose";
 
-
 const insuranceSchema = new Schema({
     number:{
         type: String,
-        require: [true, 'Insurance number is required']
+        default:""
     },
     carrier: {
         type: String,
-        require: [true, 'Insurance carrier is required']
+        default: ""
     }
 }, { _id : false })
-
-
 
 const vehicleSchema = new Schema({
     color:{
@@ -24,9 +21,7 @@ const vehicleSchema = new Schema({
         default:""
     },
     insurance:{
-        type: insuranceSchema,
-        require: [true, 'Insurance is required']
-        
+        type: insuranceSchema
     },
     licensePlates:{
          type: String,
@@ -41,9 +36,17 @@ const vehicleSchema = new Schema({
         type: String,
         require: [true, 'Model is required']
     },
+    position:{
+        type:[Number],
+        require: [true, 'Position is required']
+    },
     seats:{
         type: Number,
         require: [true, 'Seats is required']
+    },
+    status:{
+        type: String,
+        require: [true, 'Status is required']
     },
     vin:{
         type: String,
