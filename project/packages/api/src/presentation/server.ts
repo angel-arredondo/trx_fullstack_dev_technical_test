@@ -2,7 +2,7 @@ import express, { Router } from 'express';
 import cors from 'cors';
 import helmet from "helmet";
 import { CustomError } from '../utils/custom-error.util';
-import { envs } from '../adapters/env.adapter';
+
 
 interface Options {
     port?: number | string;
@@ -24,7 +24,7 @@ export class Server {
         callback: (err: Error | null, origin?: boolean) => void
     ) => {
         if (!origin) return callback(null, true)
-        if (origin === envs.ALLOWED_ORIGIN) return callback(null, true);
+        if (origin === process.env.ALLOWED_ORIGIN) return callback(null, true);
         return callback(CustomError.badRequest("Not allowed by CORS"));
     }
 
