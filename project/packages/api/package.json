@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "start": "node --env-file=.env build/app.js",
-    "start:dev": "ts-node-dev --env-file=.env src/app.ts",
+    "start": "node --env-file=.env build/index.js",
+    "start:dev": "ts-node-dev --env-file=.env src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
