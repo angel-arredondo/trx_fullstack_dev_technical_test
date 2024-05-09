@@ -32,37 +32,39 @@ import { styled } from "@mui/material/styles";
 import { Validators } from "../../../utils/validators.util";
 import { VehicleEntity } from "../../../vehicles/domain";
 import { useCreateVehicle } from "../hooks/create-vehicle.hook";
-import { Alert, Box, Skeleton, Snackbar, Stack } from "@mui/material";
+import { Box, Skeleton, Stack } from "@mui/material";
 import { usePutVehicle } from "../hooks/put-vehicle.hook";
 import { useDeleteVehicle } from "../hooks/delete-vehicle.hook";
+import { Toast } from "../../components/toast.component";
+
+let editingRowIds = [];
 
 export const VehicleTable = () => {
   const gridApiRef = useGridApiRef();
+
   const {
     paginationModel,
     setPaginationModel,
     setSelectedVehicle,
     selectedVehicle,
+    toastProps,
+    setToastProps
   } = useContext<VehicleContextType>(VehicleContext);
 
-  const { 
-    paginatedVehicles, 
-    isLoading, 
-    error, 
-    loadVehicles 
-  } = useFetchVehicles();
+  const { paginatedVehicles, isLoading, error, loadVehicles } =
+    useFetchVehicles();
 
-  const { 
-    error: putVehicleError, 
-    isLoading: isPutVehicleLoading, 
-    putVehicle 
+  const {
+    error: putVehicleError,
+    isLoading: isPutVehicleLoading,
+    putVehicle,
   } = usePutVehicle();
 
- const { 
-  error: deleteVehicleError, 
-  isLoading: isDeleteVehicleLoading, 
-  deleteVehicle
-} = useDeleteVehicle();
+  const {
+    error: deleteVehicleError,
+    isLoading: isDeleteVehicleLoading,
+    deleteVehicle,
+  } = useDeleteVehicle();
 
   const {
     error: createError,
@@ -72,7 +74,8 @@ export const VehicleTable = () => {
 
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
   const [rows, setRows] = useState<VehicleEntity[]>([]);
-  const [message, setMessage] = useState({variant:"info", value:""});
+
+
   const errorMessage = "Ocurrió un error al";
 
   useEffect(() => {
@@ -90,35 +93,35 @@ export const VehicleTable = () => {
     }
   }, [isLoading]);
 
-  useEffect(()=>{
-    if(error)
-      setMessage({
-        variant:"error",
-        value: errorMessage + " cargar las unidades"
+  useEffect(() => {
+    if (error)
+      setToastProps({
+        severity: "error",
+        message: errorMessage + " cargar las unidades",
       });
-  },[error]);
+  }, [error]);
 
   useEffect(() => {
-    if (putVehicleError) 
-      setMessage({
-        variant:"error",
-        value: errorMessage + " actualizar la unidad"
+    if (putVehicleError)
+      setToastProps({
+        severity: "error",
+        message: errorMessage + " actualizar la unidad",
       });
   }, [putVehicleError]);
 
   useEffect(() => {
-    if (deleteVehicleError) 
-      setMessage({
-        variant:"error",
-        value: errorMessage + " eliminar la unidad"
+    if (deleteVehicleError)
+      setToastProps({
+        severity: "error",
+        message: errorMessage + " eliminar la unidad",
       });
   }, [deleteVehicleError]);
 
   useEffect(() => {
-    if (createError) 
-      setMessage({
-        variant:"error",
-        value: errorMessage + " registrar la unidad"
+    if (createError)
+      setToastProps({
+        severity: "error",
+        message: errorMessage + " registrar la unidad",
       });
   }, [createError]);
 
@@ -157,7 +160,6 @@ export const VehicleTable = () => {
         ...oldModel,
         [id]: { mode: GridRowModes.Edit, fieldToFocus: "licensePlates" },
       }));
-
     };
 
     return (
@@ -192,11 +194,12 @@ export const VehicleTable = () => {
 
   const handleSaveClick = (id: GridRowId) => () => {
     const editedRow = rows.find((row) => row.id === id);
-    if(editedRow.isNew && !editedRow.licensePlates) return;
+    if (editedRow.isNew && !editedRow.licensePlates) return;
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
   };
 
   const handleCancelClick = (id: GridRowId) => () => {
+    editingRowIds = editingRowIds.filter((editingRowId) => editingRowId != id);
     setRowModesModel({
       ...rowModesModel,
       [id]: { mode: GridRowModes.View, ignoreModifications: true },
@@ -208,10 +211,11 @@ export const VehicleTable = () => {
   };
 
   const handleEditClick = (id: GridRowId) => () => {
+    editingRowIds.push(id);
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
   };
 
-  const handleDeleteClick = (id: GridRowId) => async() => {
+  const handleDeleteClick = (id: GridRowId) => async () => {
     await deleteVehicle(id as string);
     setRows(rows.filter((row) => row.id !== id));
   };
@@ -228,41 +232,48 @@ export const VehicleTable = () => {
     }
   };
 
-  const handleProcessRowUpdate= async(updatedRow: any, originalRow: any) => {
+  const handleProcessRowUpdate = async (updatedRow: any, originalRow: any) => {
     if (updatedRow.isNew) {
       const newVehicle = await createVehicle(updatedRow);
-      if(newVehicle){
+      if (newVehicle) {
         const rowToAdd = { ...updatedRow, isNew: false, id: newVehicle.id };
         setRows(rows.map((row) => (row.id === updatedRow.id ? rowToAdd : row)));
-        setMessage({variant:"success", value:"Unidad registrada exitosamente"});
+        setToastProps({
+          severity: "success",
+          message: "Unidad registrada exitosamente",
+        });
         return rowToAdd;
       }
       return updatedRow;
     }
-    
+
     originalRow.insuranceCarrier = updatedRow.insurance.carrier;
     originalRow.insuranceNumber = updatedRow.insurance.number;
 
- 
-    if(JSON.stringify(updatedRow) != JSON.stringify(originalRow)){
+    if (JSON.stringify(updatedRow) != JSON.stringify(originalRow)) {
       const updatedVehicle = await putVehicle(updatedRow.id, updatedRow);
 
       return {
-        ...updatedVehicle, 
-        insuranceCarrier: updatedVehicle.insurance.carrier, 
-        insuranceNumber:updatedVehicle.insurance.number 
+        ...updatedVehicle,
+        insuranceCarrier: updatedVehicle.insurance.carrier,
+        insuranceNumber: updatedVehicle.insurance.number,
       };
     }
     return originalRow;
   };
 
   const handlePaginationModelChange = (model: GridPaginationModel) => {
-    const editedRow = rows.find(
-      (row) => row.isNew
-    );
+    const editedRow = rows.find((row) => row.isNew);
     if (editedRow) return;
+    if (editingRowIds.length > 0) {
+      setToastProps({
+        severity: "info",
+        message: "Debe cancelar las filas en edición",
+      });
+      return;
+    }
     setPaginationModel(model);
-  }
+  };
 
   const StyledTooltip = styled(({ className, ...props }: TooltipProps) => (
     <Tooltip {...props} classes={{ popper: className }} />
@@ -499,21 +510,20 @@ export const VehicleTable = () => {
       <h1>Vehículos</h1>
       {isLoading && (
         <>
-          <Skeleton variant="text" width={"100%"} sx={{ fontSize: "2rem" }} />
-          <Skeleton variant="text" width={"100%"} sx={{ fontSize: "2rem" }} />
-          <Skeleton variant="text" width={"100%"} sx={{ fontSize: "2rem" }} />
-          <Skeleton variant="text" width={"100%"} sx={{ fontSize: "2rem" }} />
-          <Skeleton variant="text" width={"100%"} sx={{ fontSize: "2rem" }} />
-          <Skeleton variant="text" width={"100%"} sx={{ fontSize: "2rem" }} />
-          <Skeleton variant="text" width={"100%"} sx={{ fontSize: "2rem" }} />
-          <Skeleton variant="text" width={"100%"} sx={{ fontSize: "2rem" }} />
-          <Skeleton variant="text" width={"100%"} sx={{ fontSize: "2rem" }} />
-          <Skeleton variant="text" width={"100%"} sx={{ fontSize: "2rem" }} />
-          <Skeleton variant="text" width={"100%"} sx={{ fontSize: "2rem" }} />
-
+          <Skeleton variant="text" width={"100%"} sx={{ fontSize: "1.9rem" }} />
+          <Skeleton variant="text" width={"100%"} sx={{ fontSize: "1.9rem" }} />
+          <Skeleton variant="text" width={"100%"} sx={{ fontSize: "1.9rem" }} />
+          <Skeleton variant="text" width={"100%"} sx={{ fontSize: "1.9rem" }} />
+          <Skeleton variant="text" width={"100%"} sx={{ fontSize: "1.9rem" }} />
+          <Skeleton variant="text" width={"100%"} sx={{ fontSize: "1.9rem" }} />
+          <Skeleton variant="text" width={"100%"} sx={{ fontSize: "1.9rem" }} />
+          <Skeleton variant="text" width={"100%"} sx={{ fontSize: "1.9rem" }} />
+          <Skeleton variant="text" width={"100%"} sx={{ fontSize: "1.9rem" }} />
+          <Skeleton variant="text" width={"100%"} sx={{ fontSize: "1.9rem" }} />
+          <Skeleton variant="text" width={"100%"} sx={{ fontSize: "1.9rem" }} />
         </>
       )}
-      {!isLoading &&  (
+      {!isLoading && (
         <Stack spacing={2} sx={{ width: "100%", paddingBottom: 30 }}>
           <Box sx={{ height: 500, width: "100%" }}>
             <DataGrid
@@ -526,9 +536,9 @@ export const VehicleTable = () => {
               columns={columns}
               rowCount={paginatedVehicles?.totalVehicles || 0}
               loading={
-                isLoading || 
-                isCreateLoading || 
-                isPutVehicleLoading || 
+                isLoading ||
+                isCreateLoading ||
+                isPutVehicleLoading ||
                 isDeleteVehicleLoading
               }
               pageSizeOptions={[5, 10, 15]}
@@ -552,27 +562,9 @@ export const VehicleTable = () => {
               }}
             />
           </Box>
-          <Snackbar
-              anchorOrigin={{ vertical:"top", horizontal:"right" }}
-              open={!!message.value}
-              onClose={()=>setMessage({variant:"info",value:""})}
-              key={"topright"}
-            >
-              <Alert
-              severity={message.variant as any}
-              action={
-                <Button
-                  color="inherit"
-                  size="small"
-                  onClick={() => setMessage({variant:"info", value:""})}
-                >
-                  Cerrar
-                </Button>
-              }
-            >
-              {message.value}
-            </Alert>
-            </Snackbar>
+          {toastProps.message && (
+            <Toast/>
+          )}
         </Stack>
       )}
     </div>

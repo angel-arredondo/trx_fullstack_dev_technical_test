@@ -1,6 +1,7 @@
 import { createContext, useState, PropsWithChildren } from "react";
 import { GridPaginationModel } from "@mui/x-data-grid";
 import { PaginatedVehiclesEntity } from "../../../vehicles/domain";
+import { SnackbarOrigin } from "@mui/material";
 
 export type VehicleContextType = {
 	paginatedVehicles: PaginatedVehiclesEntity;
@@ -9,7 +10,16 @@ export type VehicleContextType = {
 	setSelectedVehicle:(vehicleId: string) => void;
 	paginationModel: GridPaginationModel;
 	setPaginationModel: (paginationModel: GridPaginationModel)=> void;
+	toastProps: ToastProps;
+	setToastProps:(toastProps: ToastProps) => void;
 };
+
+export type toastSeverity = "error" | "info" | "warning" | "success";
+export interface ToastProps {
+  message: string;
+  severity: toastSeverity;
+  location?: SnackbarOrigin;
+}
 export const VehicleContext = createContext<VehicleContextType| null>(null);
 
 const VehicleProvider = ({ children }: PropsWithChildren) => {
@@ -19,6 +29,10 @@ const VehicleProvider = ({ children }: PropsWithChildren) => {
 		page: 0,
         pageSize: 5,
 	});
+	const [toastProps, setToastProps] = useState<ToastProps>({
+		severity: "info",
+		message: "",
+	  });
 
     return (
         <VehicleContext.Provider
@@ -28,7 +42,9 @@ const VehicleProvider = ({ children }: PropsWithChildren) => {
 				selectedVehicle,
 				setSelectedVehicle,
 				paginationModel,
-				setPaginationModel
+				setPaginationModel,
+				toastProps,
+				setToastProps
 			}}
 		>
 			{children}
