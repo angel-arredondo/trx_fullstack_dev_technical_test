@@ -1,7 +1,7 @@
 import { 
-    ApiVehicleEntity, 
+    VehicleEntity, 
     CreateVehicleDto, 
-    PaginationVehicle,
+    PaginatedVehiclesEntity,
     GetAllVehiclesDto,
     PutDeleteVehicleDto
 } from "../domain";
@@ -15,5 +15,5 @@ export abstract class VehicleUseCase {
     abstract execute(
         vehicleDto: CreateVehicleDto | GetAllVehiclesDto | PutDeleteVehicleDto,
         createVehicleDto?: CreateVehicleDto
-    ): Promise<ApiVehicleEntity | PaginationVehicle | void>;
+    ): Promise<VehicleEntity | PaginatedVehiclesEntity | void>;
 }

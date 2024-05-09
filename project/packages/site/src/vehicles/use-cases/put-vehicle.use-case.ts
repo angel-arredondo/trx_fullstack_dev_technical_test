@@ -1,5 +1,10 @@
 import { VehicleUseCase } from "./vehicle.use-case";
-import { ApiVehicleEntity, VehicleRepository, CreateVehicleDto, PutDeleteVehicleDto } from "../domain";
+import { 
+    VehicleEntity, 
+    VehicleRepository, 
+    CreateVehicleDto, 
+    PutDeleteVehicleDto 
+} from "../domain";
 
 
 export class PutVehicleUseCase implements VehicleUseCase {
@@ -9,7 +14,7 @@ export class PutVehicleUseCase implements VehicleUseCase {
     async execute(
         putDeleteVehicleDto: PutDeleteVehicleDto, 
         createVehicleDto:CreateVehicleDto
-    ): Promise<ApiVehicleEntity> {
+    ): Promise<VehicleEntity> {
         return await this.vehicleRepository.put(
             putDeleteVehicleDto, 
             createVehicleDto

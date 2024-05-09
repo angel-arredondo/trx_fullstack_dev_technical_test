@@ -32,12 +32,26 @@ import { styled } from "@mui/material/styles";
 import { Validators } from "../../../utils/validators.util";
 import { VehicleEntity } from "../../../vehicles/domain";
 import { useCreateVehicle } from "../hooks/create-vehicle.hook";
-import { Box, Skeleton, Stack } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Skeleton,
+  Snackbar,
+  SnackbarOrigin,
+  Stack,
+} from "@mui/material";
 import { usePutVehicle } from "../hooks/put-vehicle.hook";
 import { useDeleteVehicle } from "../hooks/delete-vehicle.hook";
-import { Toast } from "../../components/toast.component";
 
 let editingRowIds = [];
+
+type severity = "error" | "info" | "warning" | "success";
+
+interface ToastProps {
+  severity: severity;
+  message: string;
+  location?: SnackbarOrigin;
+}
 
 export const VehicleTable = () => {
   const gridApiRef = useGridApiRef();
@@ -47,12 +61,15 @@ export const VehicleTable = () => {
     setPaginationModel,
     setSelectedVehicle,
     selectedVehicle,
-    toastProps,
-    setToastProps
   } = useContext<VehicleContextType>(VehicleContext);
 
   const { paginatedVehicles, isLoading, error, loadVehicles } =
     useFetchVehicles();
+
+  const [toastProps, setToastProps] = useState<ToastProps>({
+    severity: "info",
+    message: "",
+  });
 
   const {
     error: putVehicleError,
@@ -75,12 +92,10 @@ export const VehicleTable = () => {
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
   const [rows, setRows] = useState<VehicleEntity[]>([]);
 
-
   const errorMessage = "Ocurrió un error al";
 
   useEffect(() => {
-    if (selectedVehicle)
-      gridApiRef?.current?.selectRow(selectedVehicle, true, true);
+    selectedVehicle && gridApiRef?.current?.selectRow(selectedVehicle, true, true);
   }, [selectedVehicle]);
 
   useEffect(() => {
@@ -94,35 +109,31 @@ export const VehicleTable = () => {
   }, [isLoading]);
 
   useEffect(() => {
-    if (error)
-      setToastProps({
-        severity: "error",
-        message: errorMessage + " cargar las unidades",
-      });
+    error && setToastProps({
+      severity: "error",
+      message: errorMessage + " cargar las unidades",
+    });
   }, [error]);
 
   useEffect(() => {
-    if (putVehicleError)
-      setToastProps({
-        severity: "error",
-        message: errorMessage + " actualizar la unidad",
-      });
+    putVehicleError && setToastProps({
+      severity: "error",
+      message: errorMessage + " actualizar la unidad",
+    });
   }, [putVehicleError]);
 
   useEffect(() => {
-    if (deleteVehicleError)
-      setToastProps({
-        severity: "error",
-        message: errorMessage + " eliminar la unidad",
-      });
+    deleteVehicleError && setToastProps({
+      severity: "error",
+      message: errorMessage + " eliminar la unidad",
+    });
   }, [deleteVehicleError]);
 
   useEffect(() => {
-    if (createError)
-      setToastProps({
-        severity: "error",
-        message: errorMessage + " registrar la unidad",
-      });
+    createError && setToastProps({
+      severity: "error",
+      message: errorMessage + " registrar la unidad",
+    });
   }, [createError]);
 
   interface EditToolbarProps {
@@ -562,9 +573,30 @@ export const VehicleTable = () => {
               }}
             />
           </Box>
-          {toastProps.message && (
-            <Toast/>
-          )}
+          <Snackbar
+            anchorOrigin={
+              toastProps.location || { vertical: "top", horizontal: "right" }
+            }
+            open={!!toastProps.message}
+            key={"topright"}
+          >
+            <Alert
+              severity={toastProps.severity}
+              action={
+                <Button
+                  color="inherit"
+                  size="small"
+                  onClick={() =>
+                    setToastProps({ severity: "info", message: "" })
+                  }
+                >
+                  Cerrar
+                </Button>
+              }
+            >
+              {toastProps.message}
+            </Alert>
+          </Snackbar>
         </Stack>
       )}
     </div>
