@@ -3,7 +3,7 @@ import { VehicleEntity } from "./entities/vehicle.entity";
 import { GetAllVehiclesDto } from "./dtos/get-all-vehicles.dto";
 import { PutDeleteVehicleDto } from "./dtos/put-delete-vehicle.dto";
 
-export interface PaginationVehicle {
+export interface PaginatedVehicles {
     totalVehicles: number | undefined;
     limit: number | undefined;
     totalPages: number | undefined;
@@ -30,7 +30,7 @@ export abstract class VehicleRepository {
      */
     abstract getAll(
         getAllVehiclesDto: GetAllVehiclesDto
-    ): Promise<PaginationVehicle>;
+    ): Promise<PaginatedVehicles>;
 
     /**
      * Updates a `vehicle` or create it is does not exists
