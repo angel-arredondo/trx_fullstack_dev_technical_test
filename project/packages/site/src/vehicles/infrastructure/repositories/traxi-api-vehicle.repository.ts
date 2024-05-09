@@ -20,7 +20,7 @@ export class TraxiApiVehicleRepository implements VehicleRepository {
  
     async delete(deleteVehicleDto: PutDeleteVehicleDto): Promise<void> {
         await HttpClientAdapter.fetch(
-            `${import.meta.env.VITE_LOCAL_API}vehicles/${deleteVehicleDto.id}`,
+            `${import.meta.env.VITE_API}vehicles/${deleteVehicleDto.id}`,
             {...this.options, method: "DELETE"}
         );
     }
@@ -30,7 +30,7 @@ export class TraxiApiVehicleRepository implements VehicleRepository {
         createVehicleDto: CreateVehicleDto
     ): Promise<VehicleEntity> {
         const result = await HttpClientAdapter.fetch(
-            `${import.meta.env.VITE_LOCAL_API}vehicles/${putDeleteVehicleDto.id}`,
+            `${import.meta.env.VITE_API}vehicles/${putDeleteVehicleDto.id}`,
             {
                 method: "PUT",
                 body: JSON.stringify(createVehicleDto),
@@ -43,7 +43,7 @@ export class TraxiApiVehicleRepository implements VehicleRepository {
     async getAll(getAllVehiclesDto: GetAllVehiclesDto): Promise<PaginatedVehiclesEntity> {
         const { page, limit } = getAllVehiclesDto;
         const paginatedVehicles = await HttpClientAdapter.fetch(
-            `${import.meta.env.VITE_LOCAL_API}vehicles?limit=${limit}&page=${page}`
+            `${import.meta.env.VITE_API}vehicles?limit=${limit}&page=${page}`
         );
         return PaginatedVehiclesMapper.paginatedVehiclesEntityFromObject(paginatedVehicles);
     }

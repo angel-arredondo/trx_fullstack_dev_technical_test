@@ -6,7 +6,7 @@ import { GeoRouteMapper } from "../geo-route.mapper";
 export class TraxiApiGeoRouteRepository implements GeoRouteRepository {
     async getAll() {
         const routes = await HttpClientAdapter.fetch(
-            `${import.meta.env.VITE_LOCAL_API}georoutes`
+            `${import.meta.env.VITE_API}georoutes`
         );
         if(!Array.isArray(routes)) throw Error("");
 
