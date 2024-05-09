@@ -1,7 +1,4 @@
-interface Options extends RequestInit {
-    method: "GET" | "POST" | "PUT" | "DELETE";
-}
-
+import { CustomError } from "../utils/custom-errors.util";
 
 export class HttpClientAdapter {
     /**
@@ -10,15 +7,15 @@ export class HttpClientAdapter {
      * @param {FetchOptions} options - Options for the request
      * @returns {Promise} Promise object represents the response
      */
-    static async fetch(url: string, options?: Options): Promise<any|void> {
+    static async fetch(url: string, options?: RequestInit): Promise<any|void> {
         if (!url.startsWith("http")) {
-            throw new Error("Invalid URL");
+            throw CustomError.fetch("Invalid url");
         }
 
         const response = await window.fetch(url, options);
 
         if (!response.ok) {
-            throw new Error(`Fetch error:${response.statusText}, ${response.text()}`)
+            throw CustomError.fetch(`Fetch: ${response.statusText}, ${response.text()}`);
         }
 
         if(response.status != 204){

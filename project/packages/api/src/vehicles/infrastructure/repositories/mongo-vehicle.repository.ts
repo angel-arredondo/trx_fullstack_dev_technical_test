@@ -1,6 +1,11 @@
 import { VehicleModel } from "../../../data/mongodb/models/vehicle.model";
 import { CustomError } from "../../../utils/custom-error.util";
-import { CreateVehicleDto, PaginationVehicle, VehicleEntity, VehicleRepository } from "../../domain";
+import { 
+    CreateVehicleDto, 
+    PaginatedVehicles, 
+    VehicleEntity, 
+    VehicleRepository 
+} from "../../domain";
 import { VehicleMapper } from "../vehicle.mapper";
 import { GetAllVehiclesDto } from "../../domain/dtos/get-all-vehicles.dto";
 import { PutDeleteVehicleDto } from "../../domain/dtos/put-delete-vehicle.dto";
@@ -28,7 +33,7 @@ export class MongoVehicleRepository implements VehicleRepository {
 
     async getAll(
         getAllVehiclesDto: GetAllVehiclesDto
-    ): Promise<PaginationVehicle> {
+    ): Promise<PaginatedVehicles> {
         const { limit, page, query } = getAllVehiclesDto;
         const vehicleEntities: VehicleEntity[] = [];
         const queryOptions = {

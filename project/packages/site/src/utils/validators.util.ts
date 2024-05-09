@@ -1,8 +1,8 @@
-import { SiteVehicleEntity } from "../vehicle/domain";
+import { VehicleEntity } from "../vehicles/domain";
 
 
 export class Validators {
-    static getErrorMessage(key: keyof SiteVehicleEntity, value: number | string): string | undefined {
+    static getErrorMessage(key: keyof VehicleEntity, value: number | string): string | undefined {
         const validationByKey = {
             "licensePlates": () => {
                 if (!value) return "Placas son requeridas";
