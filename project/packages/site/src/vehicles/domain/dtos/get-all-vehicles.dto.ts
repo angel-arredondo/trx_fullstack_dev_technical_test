@@ -3,9 +3,7 @@ import { Validators } from "../../../utils/validators.util";
 export class GetAllVehiclesDto {
     private constructor(
         public limit: number,
-        public page: number,
-        // public query: string,
-        // public sort: string
+        public page: number
     ) { }
 
     static create(object: { [key: string]: any }): [string?, GetAllVehiclesDto?] {
@@ -22,11 +20,6 @@ export class GetAllVehiclesDto {
         }
             
         page++;
-       
-            
-        // if(!query) query = '';
-
-        // if(!sort) sort = 'year';
 
         return [undefined, new GetAllVehiclesDto(limit, page)];       
     }
