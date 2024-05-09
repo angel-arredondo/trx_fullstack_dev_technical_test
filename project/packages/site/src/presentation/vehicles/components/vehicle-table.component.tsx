@@ -204,8 +204,6 @@ export const VehicleTable = () => {
   };
 
   const handleSaveClick = (id: GridRowId) => () => {
-    const editedRow = rows.find((row) => row.id === id);
-    if (editedRow.isNew && !editedRow.licensePlates) return;
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.View } });
   };
 
@@ -227,6 +225,7 @@ export const VehicleTable = () => {
   };
 
   const handleDeleteClick = (id: GridRowId) => async () => {
+    editingRowIds = editingRowIds.filter((editingRowId) => editingRowId != id);
     await deleteVehicle(id as string);
     setRows(rows.filter((row) => row.id !== id));
   };
@@ -245,6 +244,14 @@ export const VehicleTable = () => {
 
   const handleProcessRowUpdate = async (updatedRow: any, originalRow: any) => {
     if (updatedRow.isNew) {
+      if(!updatedRow.licensePlates) {
+        setToastProps({
+          severity: "info",
+          message: "Se deben registrar datos",
+        });
+        return;
+      }
+      editingRowIds = editingRowIds.filter((editingRowId) => editingRowId != updatedRow.id);
       const newVehicle = await createVehicle(updatedRow);
       if (newVehicle) {
         const rowToAdd = { ...updatedRow, isNew: false, id: newVehicle.id };
@@ -260,10 +267,10 @@ export const VehicleTable = () => {
 
     originalRow.insuranceCarrier = updatedRow.insurance.carrier;
     originalRow.insuranceNumber = updatedRow.insurance.number;
-
+    editingRowIds = editingRowIds.filter((editingRowId) => editingRowId != updatedRow.id);
     if (JSON.stringify(updatedRow) != JSON.stringify(originalRow)) {
       const updatedVehicle = await putVehicle(updatedRow.id, updatedRow);
-
+      
       return {
         ...updatedVehicle,
         insuranceCarrier: updatedVehicle.insurance.carrier,
@@ -297,7 +304,7 @@ export const VehicleTable = () => {
 
   function renderEditInputCell(props: GridRenderEditCellParams) {
     const hasError = !!props.error;
-    const errorMessage = props.error;
+    const errorMessage = props.error; 
     props.error = hasError;
     return (
       <StyledTooltip open={hasError} title={errorMessage}>
@@ -578,7 +585,11 @@ export const VehicleTable = () => {
               toastProps.location || { vertical: "top", horizontal: "right" }
             }
             open={!!toastProps.message}
-            key={"topright"}
+            key={
+              toastProps.location ?
+                toastProps.location.horizontal+toastProps.location.vertical:
+                "topright"
+            }
           >
             <Alert
               severity={toastProps.severity}
