@@ -16,10 +16,10 @@ export const useFetchVehicles = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<Error>();
 
-    const loadVehicles = async () =>{
+    const loadVehicles = async (query?:string) =>{
         try{
             setIsLoading(true)
-            const [error, getAllVehiclesDto] = GetAllVehiclesDto.create(paginationModel);
+            const [error, getAllVehiclesDto] = GetAllVehiclesDto.create({...paginationModel, query});
    
             if(error) throw CustomError.dto(`GetAllVehiclesDto -> ${error}`);
 

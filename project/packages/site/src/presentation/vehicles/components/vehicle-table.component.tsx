@@ -11,8 +11,6 @@ import {
   GridRowId,
   GridEventListener,
   GridRowEditStopReasons,
-  GridRowsProp,
-  GridToolbarContainer,
   GridSlots,
   GridPreProcessEditCellProps,
   GridRenderEditCellParams,
@@ -21,8 +19,9 @@ import {
 } from "@mui/x-data-grid";
 import { useFetchVehicles } from "../hooks/fetch-vehicles.hook";
 import Button from "@mui/material/Button";
-import AddIcon from "@mui/icons-material/Add";
+
 import EditIcon from "@mui/icons-material/Edit";
+
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Close";
@@ -35,13 +34,15 @@ import { useCreateVehicle } from "../hooks/create-vehicle.hook";
 import {
   Alert,
   Box,
-  Skeleton,
   Snackbar,
   SnackbarOrigin,
   Stack,
 } from "@mui/material";
 import { usePutVehicle } from "../hooks/put-vehicle.hook";
 import { useDeleteVehicle } from "../hooks/delete-vehicle.hook";
+
+import NoVehiclesIcon from "../assets/no-vehicles.svg";
+import { ToolbarTable } from "./toolbar-table.component";
 
 let editingRowIds = [];
 
@@ -65,7 +66,7 @@ export const VehicleTable = () => {
 
   const { paginatedVehicles, isLoading, error, loadVehicles } =
     useFetchVehicles();
-
+ 
   const [toastProps, setToastProps] = useState<ToastProps>({
     severity: "info",
     message: "",
@@ -92,10 +93,13 @@ export const VehicleTable = () => {
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
   const [rows, setRows] = useState<VehicleEntity[]>([]);
 
+  const [searchValue, setSearchValue] = useState(paginatedVehicles?.query)
+
   const errorMessage = "Ocurrió un error al";
 
   useEffect(() => {
-    selectedVehicle && gridApiRef?.current?.selectRow(selectedVehicle, true, true);
+    selectedVehicle &&
+      gridApiRef?.current?.selectRow(selectedVehicle, true, true);
   }, [selectedVehicle]);
 
   useEffect(() => {
@@ -109,85 +113,41 @@ export const VehicleTable = () => {
   }, [isLoading]);
 
   useEffect(() => {
-    error && setToastProps({
-      severity: "error",
-      message: errorMessage + " cargar las unidades",
-    });
+    error &&
+      setToastProps({
+        severity: "error",
+        message: errorMessage + " cargar las unidades",
+      });
   }, [error]);
 
   useEffect(() => {
-    putVehicleError && setToastProps({
-      severity: "error",
-      message: errorMessage + " actualizar la unidad",
-    });
+    putVehicleError &&
+      setToastProps({
+        severity: "error",
+        message: errorMessage + " actualizar la unidad",
+      });
   }, [putVehicleError]);
 
   useEffect(() => {
-    deleteVehicleError && setToastProps({
-      severity: "error",
-      message: errorMessage + " eliminar la unidad",
-    });
+    deleteVehicleError &&
+      setToastProps({
+        severity: "error",
+        message: errorMessage + " eliminar la unidad",
+      });
   }, [deleteVehicleError]);
 
   useEffect(() => {
-    createError && setToastProps({
-      severity: "error",
-      message: errorMessage + " registrar la unidad",
-    });
+    createError &&
+      setToastProps({
+        severity: "error",
+        message: errorMessage + " registrar la unidad",
+      });
   }, [createError]);
 
-  interface EditToolbarProps {
-    setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
-    setRowModesModel: (
-      newModel: (oldModel: GridRowModesModel) => GridRowModesModel
-    ) => void;
-  }
 
-  function EditToolbar(props: EditToolbarProps) {
-    const { setRows, setRowModesModel } = props;
+ 
 
-    const handleClick = () => {
-      const id = 1;
-      setRows((oldRows) => [
-        ...oldRows,
-        {
-          id,
-          color: "",
-          economicNumber: "",
-          insurance: {
-            carrier: "",
-            number: "",
-          },
-          licensePlates: "",
-          manufacturer: "",
-          model: "",
-          seats: 5,
-          vin: "",
-          year: new Date().getFullYear(),
-          isNew: true,
-        },
-      ]);
-      setRowModesModel((oldModel) => ({
-        ...oldModel,
-        [id]: { mode: GridRowModes.Edit, fieldToFocus: "licensePlates" },
-      }));
-    };
-
-    return (
-      <>
-        <GridToolbarContainer>
-          <Button
-            color="primary"
-            className="table add-button"
-            startIcon={<AddIcon />}
-            onClick={handleClick}
-          >
-            Nuevo
-          </Button>
-        </GridToolbarContainer>
-      </>
-    );
-  }
+  
 
   type Row = (typeof paginatedVehicles.vehicles)[number];
 
@@ -229,6 +189,8 @@ export const VehicleTable = () => {
     await deleteVehicle(id as string);
     setRows(rows.filter((row) => row.id !== id));
   };
+
+ 
   const handleRowModesModelChange = (newRowModesModel: GridRowModesModel) => {
     setRowModesModel(newRowModesModel);
   };
@@ -244,14 +206,9 @@ export const VehicleTable = () => {
 
   const handleProcessRowUpdate = async (updatedRow: any, originalRow: any) => {
     if (updatedRow.isNew) {
-      if(!updatedRow.licensePlates) {
-        setToastProps({
-          severity: "info",
-          message: "Se deben registrar datos",
-        });
-        return;
-      }
-      editingRowIds = editingRowIds.filter((editingRowId) => editingRowId != updatedRow.id);
+      editingRowIds = editingRowIds.filter(
+        (editingRowId) => editingRowId != updatedRow.id
+      );
       const newVehicle = await createVehicle(updatedRow);
       if (newVehicle) {
         const rowToAdd = { ...updatedRow, isNew: false, id: newVehicle.id };
@@ -267,10 +224,12 @@ export const VehicleTable = () => {
 
     originalRow.insuranceCarrier = updatedRow.insurance.carrier;
     originalRow.insuranceNumber = updatedRow.insurance.number;
-    editingRowIds = editingRowIds.filter((editingRowId) => editingRowId != updatedRow.id);
+    editingRowIds = editingRowIds.filter(
+      (editingRowId) => editingRowId != updatedRow.id
+    );
     if (JSON.stringify(updatedRow) != JSON.stringify(originalRow)) {
       const updatedVehicle = await putVehicle(updatedRow.id, updatedRow);
-      
+
       return {
         ...updatedVehicle,
         insuranceCarrier: updatedVehicle.insurance.carrier,
@@ -279,10 +238,12 @@ export const VehicleTable = () => {
     }
     return originalRow;
   };
-
+  
+  const handleSearchClick = (value:string) => {
+    console.log(value)
+    loadVehicles(value);
+  }
   const handlePaginationModelChange = (model: GridPaginationModel) => {
-    const editedRow = rows.find((row) => row.isNew);
-    if (editedRow) return;
     if (editingRowIds.length > 0) {
       setToastProps({
         severity: "info",
@@ -290,6 +251,7 @@ export const VehicleTable = () => {
       });
       return;
     }
+
     setPaginationModel(model);
   };
 
@@ -304,7 +266,7 @@ export const VehicleTable = () => {
 
   function renderEditInputCell(props: GridRenderEditCellParams) {
     const hasError = !!props.error;
-    const errorMessage = props.error; 
+    const errorMessage = props.error;
     props.error = hasError;
     return (
       <StyledTooltip open={hasError} title={errorMessage}>
@@ -320,6 +282,8 @@ export const VehicleTable = () => {
       field: "actions",
       type: "actions",
       headerName: "Modificar",
+      headerAlign: 'center',
+      align: "center",
       width: 100,
       cellClassName: "actions",
       getActions: ({ id }) => {
@@ -368,6 +332,8 @@ export const VehicleTable = () => {
       width: 150,
       type: "string",
       editable: true,
+      headerAlign: 'center',
+      align: "center",
       valueParser: (value) => {
         return value.toUpperCase().trim();
       },
@@ -385,6 +351,8 @@ export const VehicleTable = () => {
       width: 150,
       editable: true,
       type: "string",
+      headerAlign: 'center',
+      align: "center",
       valueParser: (value) => {
         return value.trim();
       },
@@ -403,6 +371,8 @@ export const VehicleTable = () => {
       field: "insuranceCarrier",
       headerName: "Aseguradora",
       width: 150,
+      headerAlign: 'center',
+      align: "center",
       valueGetter: getInsuranceCarrier,
       editable: true,
       type: "string",
@@ -416,6 +386,8 @@ export const VehicleTable = () => {
       width: 150,
       valueGetter: getInsuranceNumber,
       editable: true,
+      align: "center",
+      headerAlign: 'center',
       type: "string",
       valueParser: (value) => {
         return value.trim();
@@ -427,6 +399,8 @@ export const VehicleTable = () => {
       width: 150,
       editable: true,
       type: "string",
+      headerAlign: 'center',
+      align: "center",
       valueParser: (value) => {
         return value.toUpperCase().trim();
       },
@@ -444,6 +418,8 @@ export const VehicleTable = () => {
       headerName: "Asientos",
       width: 150,
       editable: true,
+      align: "center",
+      headerAlign: 'center',
       preProcessEditCellProps: async (params: GridPreProcessEditCellProps) => {
         const { value } = params.props;
         const errorMessage = Validators.getErrorMessage("seats", value);
@@ -458,6 +434,8 @@ export const VehicleTable = () => {
       width: 150,
       editable: true,
       type: "string",
+      headerAlign: 'center',
+      align: "center",
       valueParser: (value) => {
         return value.trim();
       },
@@ -475,6 +453,8 @@ export const VehicleTable = () => {
       width: 150,
       editable: true,
       type: "string",
+      headerAlign: 'center',
+      align: "center",
       valueParser: (value) => {
         return value.trim();
       },
@@ -492,6 +472,8 @@ export const VehicleTable = () => {
       headerName: "Año",
       width: 150,
       editable: true,
+      headerAlign: 'center',
+      align: "center",
       valueParser: (value) => {
         return value ? parseInt(value) : 0;
       },
@@ -510,6 +492,8 @@ export const VehicleTable = () => {
       headerName: "Color",
       width: 150,
       editable: true,
+      headerAlign: 'center',
+      align: "center",
       valueParser: (value) => {
         return value.trim();
       },
@@ -522,26 +506,21 @@ export const VehicleTable = () => {
       renderEditCell: renderEditInputCell,
     },
   ];
+  function NoRowsOverlay() {
+    return(
+      <section className="table no-vehicles">
+        <img width={"15%"} src={NoVehiclesIcon} alt="sin vehículos" />
+
+        <h3>No se encontraron vehículos</h3>
+      </section>
+    )
+  }
 
   return (
     <div className="table container">
       <h1>Vehículos</h1>
-      {isLoading && (
-        <>
-          <Skeleton variant="text" width={"100%"} sx={{ fontSize: "1.9rem" }} />
-          <Skeleton variant="text" width={"100%"} sx={{ fontSize: "1.9rem" }} />
-          <Skeleton variant="text" width={"100%"} sx={{ fontSize: "1.9rem" }} />
-          <Skeleton variant="text" width={"100%"} sx={{ fontSize: "1.9rem" }} />
-          <Skeleton variant="text" width={"100%"} sx={{ fontSize: "1.9rem" }} />
-          <Skeleton variant="text" width={"100%"} sx={{ fontSize: "1.9rem" }} />
-          <Skeleton variant="text" width={"100%"} sx={{ fontSize: "1.9rem" }} />
-          <Skeleton variant="text" width={"100%"} sx={{ fontSize: "1.9rem" }} />
-          <Skeleton variant="text" width={"100%"} sx={{ fontSize: "1.9rem" }} />
-          <Skeleton variant="text" width={"100%"} sx={{ fontSize: "1.9rem" }} />
-          <Skeleton variant="text" width={"100%"} sx={{ fontSize: "1.9rem" }} />
-        </>
-      )}
-      {!isLoading && (
+      
+      
         <Stack spacing={2} sx={{ width: "100%", paddingBottom: 30 }}>
           <Box sx={{ height: 500, width: "100%" }}>
             <DataGrid
@@ -552,7 +531,7 @@ export const VehicleTable = () => {
               onRowModesModelChange={handleRowModesModelChange}
               onRowEditStop={handleRowEditStop}
               columns={columns}
-              rowCount={paginatedVehicles?.totalVehicles || 0}
+              rowCount={paginatedVehicles?.totalVehicles}
               loading={
                 isLoading ||
                 isCreateLoading ||
@@ -573,10 +552,17 @@ export const VehicleTable = () => {
               }}
               processRowUpdate={handleProcessRowUpdate}
               slots={{
-                toolbar: EditToolbar as GridSlots["toolbar"],
+                toolbar: ToolbarTable as GridSlots["toolbar"],
+                noRowsOverlay: NoRowsOverlay as GridSlots["noRowsOverlay"]
               }}
               slotProps={{
-                toolbar: { setRows, setRowModesModel },
+                toolbar: { 
+                  setRows, 
+                  setRowModesModel, 
+                  setSearchValue, 
+                  searchValue,
+                  handleSearchClick
+                }
               }}
             />
           </Box>
@@ -586,9 +572,9 @@ export const VehicleTable = () => {
             }
             open={!!toastProps.message}
             key={
-              toastProps.location ?
-                toastProps.location.horizontal+toastProps.location.vertical:
-                "topright"
+              toastProps.location
+                ? toastProps.location.horizontal + toastProps.location.vertical
+                : "topright"
             }
           >
             <Alert
@@ -609,7 +595,7 @@ export const VehicleTable = () => {
             </Alert>
           </Snackbar>
         </Stack>
-      )}
+      
     </div>
   );
 };

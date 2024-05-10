@@ -70,6 +70,7 @@ export class MongoVehicleRepository implements VehicleRepository {
             hasNextPage: page < totalPages,
             prevPage: page > 1 ? page - 1 : undefined,
             nextPage: page < totalPages ? page + 1 : undefined,
+            query,
             vehicles: vehicleEntities
         };
     }

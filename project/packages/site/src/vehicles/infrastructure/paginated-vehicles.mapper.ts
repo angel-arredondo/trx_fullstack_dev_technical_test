@@ -14,6 +14,7 @@ export class PaginatedVehiclesMapper {
             hasNextPage,
             prevPage,
             nextPage,
+            query,
             vehicles
         } = object;
         const error = "PaginatedVehiclesMapper ->"
@@ -42,6 +43,7 @@ export class PaginatedVehiclesMapper {
            hasNextPage,
            prevPage,
            nextPage,
+           query,
            parsedVehicles,
         )
     }
