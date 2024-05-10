@@ -4,14 +4,15 @@ import { GetAllVehiclesDto } from "./dtos/get-all-vehicles.dto";
 import { PutDeleteVehicleDto } from "./dtos/put-delete-vehicle.dto";
 
 export interface PaginatedVehicles {
-    totalVehicles: number | undefined;
-    limit: number | undefined;
-    totalPages: number | undefined;
+    totalVehicles: number;
+    limit: number;
+    totalPages: number;
     page: number | undefined;
-    hasPrevPage: Boolean | undefined;
-    hasNextPage: Boolean | undefined;
+    hasPrevPage: Boolean;
+    hasNextPage: Boolean;
     prevPage: number | undefined;
     nextPage: number | undefined;
+    query: string;
     vehicles: VehicleEntity[];
 }
 

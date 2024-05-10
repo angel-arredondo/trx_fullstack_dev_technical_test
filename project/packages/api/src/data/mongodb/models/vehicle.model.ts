@@ -60,7 +60,4 @@ const vehicleSchema = new Schema({
 })
 
 
-
-
-// export const VehicleModel: Pagination<VehicleEntity> = model<VehicleEntity, Pagination<VehicleEntity>>("Vehicle", vehicleSchema)
 export const VehicleModel = model('Vehicle',vehicleSchema);
