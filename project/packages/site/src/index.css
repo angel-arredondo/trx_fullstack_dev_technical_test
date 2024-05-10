@@ -12,7 +12,7 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
-.leaflet-container{
+.leaflet-container {
   width: 100%;
   height: 500px;
 }
@@ -23,7 +23,6 @@ body {
   min-width: 320px;
   min-height: 100vh;
 }
-
 
 .table.container {
   border-top: 1px solid #d8d8d8;
@@ -43,16 +42,14 @@ body {
 .toolbar {
   display: flex;
   width: 100%;
-  /* background-color: #494949; */
   justify-content: space-between;
   align-items: center;
   padding: 5px 3px;
-
 }
 .toolbar.add-button {
   font-weight: bolder;
   font-size: larger;
-  width: 15%;
+  width: 100px;
   border: none;
   color: var(--primary);
   cursor: pointer;
@@ -69,20 +66,17 @@ body {
   transition: 0.3s;
 }
 
-
 .toolbar.search {
   width: 45%;
   height: 25px;
   display: flex;
-  /* background-color: pink; */
-  justify-content:end;
-  /* align-items: center; */
+  justify-content: end;
 }
 .toolbar.search-field {
   width: 70%;
   border: none;
   padding: 6px 10px;
-  
+
   border-top-left-radius: 5px;
   border-bottom-left-radius: 5px;
   outline: none;
@@ -90,66 +84,63 @@ body {
 }
 
 .toolbar.search-cancel {
-  width: 12%;
+  width: 30px;
   border: none;
-  color:var(--primary);
+  color: var(--primary);
   justify-content: center;
 }
 
 .toolbar.cancel-icon {
-  filter: drop-shadow(3px 2px 3px rgba(0,0,0,0.3));
+  filter: drop-shadow(3px 2px 3px rgba(0, 0, 0, 0.3));
 }
 
 .toolbar.search-cancel:hover {
-  color:var(--primary-hover);
+  color: var(--primary-hover);
 }
 
-.toolbar.search-button{
+.toolbar.search-button {
   border: none;
-  width: 10%;
+  width: 30px;
   cursor: pointer;
   padding-block: 6px 7px;
-  color:var(--primary);
+  color: var(--primary);
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
   background-color: white;
+  align-items: end;
+  justify-content: end;
   
-  padding-right: 20px;
 }
 .toolbar.search-button:enabled:hover {
-  color:rgb(5, 142, 233);
+  color: rgb(5, 142, 233);
 }
 .toolbar.search-button:disabled {
-  color:#535353;
-  cursor:auto;
+  color: #535353;
+  cursor: auto;
 }
-
 
 .table.no-vehicles {
   justify-content: center;
   height: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;  
+  align-items: center;
 }
-
 
 .table.no-vehicles img {
   margin-bottom: -20px;
 }
 .table.no-vehicles h3 {
-font-size: 1rem;
-font-weight: 500;
-color: #535353;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #535353;
 }
 
 li:nth-of-type(n + 1) {
   list-style-type: none;
-  
 }
 li {
   width: 15em;
-  
 }
 li span {
   font-weight: 600;

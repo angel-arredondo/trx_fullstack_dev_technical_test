@@ -11,8 +11,6 @@ import {
   GridRowId,
   GridEventListener,
   GridRowEditStopReasons,
-  GridRowsProp,
-  GridToolbarContainer,
   GridSlots,
   GridPreProcessEditCellProps,
   GridRenderEditCellParams,
@@ -44,7 +42,7 @@ import { usePutVehicle } from "../hooks/put-vehicle.hook";
 import { useDeleteVehicle } from "../hooks/delete-vehicle.hook";
 
 import NoVehiclesIcon from "../assets/no-vehicles.svg";
-import { EditToolbar } from "./tool-table.component";
+import { ToolbarTable } from "./toolbar-table.component";
 
 let editingRowIds = [];
 
@@ -284,6 +282,8 @@ export const VehicleTable = () => {
       field: "actions",
       type: "actions",
       headerName: "Modificar",
+      headerAlign: 'center',
+      align: "center",
       width: 100,
       cellClassName: "actions",
       getActions: ({ id }) => {
@@ -332,6 +332,8 @@ export const VehicleTable = () => {
       width: 150,
       type: "string",
       editable: true,
+      headerAlign: 'center',
+      align: "center",
       valueParser: (value) => {
         return value.toUpperCase().trim();
       },
@@ -349,6 +351,8 @@ export const VehicleTable = () => {
       width: 150,
       editable: true,
       type: "string",
+      headerAlign: 'center',
+      align: "center",
       valueParser: (value) => {
         return value.trim();
       },
@@ -367,6 +371,8 @@ export const VehicleTable = () => {
       field: "insuranceCarrier",
       headerName: "Aseguradora",
       width: 150,
+      headerAlign: 'center',
+      align: "center",
       valueGetter: getInsuranceCarrier,
       editable: true,
       type: "string",
@@ -380,6 +386,8 @@ export const VehicleTable = () => {
       width: 150,
       valueGetter: getInsuranceNumber,
       editable: true,
+      align: "center",
+      headerAlign: 'center',
       type: "string",
       valueParser: (value) => {
         return value.trim();
@@ -391,6 +399,8 @@ export const VehicleTable = () => {
       width: 150,
       editable: true,
       type: "string",
+      headerAlign: 'center',
+      align: "center",
       valueParser: (value) => {
         return value.toUpperCase().trim();
       },
@@ -408,6 +418,8 @@ export const VehicleTable = () => {
       headerName: "Asientos",
       width: 150,
       editable: true,
+      align: "center",
+      headerAlign: 'center',
       preProcessEditCellProps: async (params: GridPreProcessEditCellProps) => {
         const { value } = params.props;
         const errorMessage = Validators.getErrorMessage("seats", value);
@@ -422,6 +434,8 @@ export const VehicleTable = () => {
       width: 150,
       editable: true,
       type: "string",
+      headerAlign: 'center',
+      align: "center",
       valueParser: (value) => {
         return value.trim();
       },
@@ -439,6 +453,8 @@ export const VehicleTable = () => {
       width: 150,
       editable: true,
       type: "string",
+      headerAlign: 'center',
+      align: "center",
       valueParser: (value) => {
         return value.trim();
       },
@@ -456,6 +472,8 @@ export const VehicleTable = () => {
       headerName: "Año",
       width: 150,
       editable: true,
+      headerAlign: 'center',
+      align: "center",
       valueParser: (value) => {
         return value ? parseInt(value) : 0;
       },
@@ -474,6 +492,8 @@ export const VehicleTable = () => {
       headerName: "Color",
       width: 150,
       editable: true,
+      headerAlign: 'center',
+      align: "center",
       valueParser: (value) => {
         return value.trim();
       },
@@ -532,7 +552,7 @@ export const VehicleTable = () => {
               }}
               processRowUpdate={handleProcessRowUpdate}
               slots={{
-                toolbar: EditToolbar as GridSlots["toolbar"],
+                toolbar: ToolbarTable as GridSlots["toolbar"],
                 noRowsOverlay: NoRowsOverlay as GridSlots["noRowsOverlay"]
               }}
               slotProps={{
