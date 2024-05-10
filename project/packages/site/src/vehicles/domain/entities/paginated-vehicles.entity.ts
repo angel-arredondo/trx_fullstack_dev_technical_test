@@ -10,6 +10,7 @@ export class PaginatedVehiclesEntity {
         public hasNextPage: Boolean,
         public prevPage: number,
         public nextPage: number,
+        public query: string,
         public vehicles: VehicleEntity[],
     ) { }
 }
