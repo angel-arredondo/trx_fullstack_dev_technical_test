@@ -34,9 +34,10 @@ export class MongoVehicleRepository implements VehicleRepository {
     async getAll(
         getAllVehiclesDto: GetAllVehiclesDto
     ): Promise<PaginatedVehicles> {
-        const { limit, page, query } = getAllVehiclesDto;
+        const { limit, page, query, filter } = getAllVehiclesDto;
+        
         const vehicleEntities: VehicleEntity[] = [];
-        const queryOptions = {
+        const queryOptions: any = !query? { } : {
             $or: [
                 { manufacturer: { $regex: query, $options: 'i' } },
                 { vin: { $regex: query, $options: 'i' } },
@@ -45,13 +46,32 @@ export class MongoVehicleRepository implements VehicleRepository {
                 { licensePlates: { $regex: query, $options: 'i' } }
             ]
         }
-        const vehicles = await VehicleModel.find(
-            query ? queryOptions : {}
-        ).skip((page - 1) * limit).limit(limit);
+
+         if(filter){
+            const getOperator = {
+                "contains": { $regex: filter.value, $options: 'i' },
+                "equals": { $eq: filter.value },
+                "starts": { $regex: new RegExp(`^${filter.value}` , 'i') },
+                "=": { $eq: parseInt(filter.value)},
+                "<": { $lt: parseInt(filter.value)},
+                "<=": { $lte: parseInt(filter.value)},
+                ">": { $gt: parseInt(filter.value)},
+                ">=": { $gte: parseInt(filter.value)},
+            }
+            queryOptions[
+                filter.filter as keyof typeof queryOptions
+            ] = getOperator[
+                filter.operator as keyof typeof getOperator
+            ];
+         }
+
+        const vehicles = await VehicleModel.find(queryOptions)
+            .skip((page - 1) * limit)
+            .limit(limit);
 
 
         const total = await VehicleModel.countDocuments(
-            query ? queryOptions : {}
+            queryOptions
         )
 
         for (const doc of vehicles) {
