@@ -17,11 +17,9 @@ import {
   GridEditInputCell,
   GridPaginationModel,
 } from "@mui/x-data-grid";
-import { useFetchVehicles } from "../hooks/fetch-vehicles.hook";
+import { SearchProps, useFetchVehicles } from "../hooks/fetch-vehicles.hook";
 import Button from "@mui/material/Button";
-
 import EditIcon from "@mui/icons-material/Edit";
-
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Close";
@@ -40,13 +38,13 @@ import {
 } from "@mui/material";
 import { usePutVehicle } from "../hooks/put-vehicle.hook";
 import { useDeleteVehicle } from "../hooks/delete-vehicle.hook";
-
 import NoVehiclesIcon from "../assets/no-vehicles.svg";
 import { ToolbarTable } from "./toolbar-table.component";
+import { userMessages } from "../constants/user-messages.constant";
 
 let editingRowIds = [];
 
-type severity = "error" | "info" | "warning" | "success";
+export type severity = "error" | "info" | "warning" | "success";
 
 interface ToastProps {
   severity: severity;
@@ -62,6 +60,7 @@ export const VehicleTable = () => {
     setPaginationModel,
     setSelectedVehicle,
     selectedVehicle,
+    searchProps
   } = useContext<VehicleContextType>(VehicleContext);
 
   const { paginatedVehicles, isLoading, error, loadVehicles } =
@@ -93,9 +92,9 @@ export const VehicleTable = () => {
   const [rowModesModel, setRowModesModel] = useState<GridRowModesModel>({});
   const [rows, setRows] = useState<VehicleEntity[]>([]);
 
-  const [searchValue, setSearchValue] = useState(paginatedVehicles?.query)
+  const [searchValue, setSearchValue] = useState(paginatedVehicles?.query);
 
-  const errorMessage = "Ocurrió un error al";
+  type Row = (typeof paginatedVehicles.vehicles)[number];
 
   useEffect(() => {
     selectedVehicle &&
@@ -103,20 +102,23 @@ export const VehicleTable = () => {
   }, [selectedVehicle]);
 
   useEffect(() => {
-    loadVehicles();
+    const { query, filter, operator, value } = searchProps;
+    if(!query && (!filter && !operator && !value))
+      loadVehicles();
+    loadVehicles(searchProps);
   }, [paginationModel]);
 
   useEffect(() => {
     if (!error && !isLoading) {
       setRows(paginatedVehicles.vehicles);
     }
-  }, [isLoading]);
+  }, [paginatedVehicles?.vehicles]);
 
   useEffect(() => {
     error &&
       setToastProps({
         severity: "error",
-        message: errorMessage + " cargar las unidades",
+        message: userMessages.error.load,
       });
   }, [error]);
 
@@ -124,7 +126,7 @@ export const VehicleTable = () => {
     putVehicleError &&
       setToastProps({
         severity: "error",
-        message: errorMessage + " actualizar la unidad",
+        message: userMessages.error.update,
       });
   }, [putVehicleError]);
 
@@ -132,7 +134,7 @@ export const VehicleTable = () => {
     deleteVehicleError &&
       setToastProps({
         severity: "error",
-        message: errorMessage + " eliminar la unidad",
+        message: userMessages.error.delete,
       });
   }, [deleteVehicleError]);
 
@@ -140,16 +142,9 @@ export const VehicleTable = () => {
     createError &&
       setToastProps({
         severity: "error",
-        message: errorMessage + " registrar la unidad",
+        message: userMessages.error.create,
       });
   }, [createError]);
-
-
- 
-
-  
-
-  type Row = (typeof paginatedVehicles.vehicles)[number];
 
   const getInsuranceCarrier: GridValueGetter<Row> = (_value, row) => {
     return `${row.insurance.carrier || ""}`;
@@ -188,6 +183,10 @@ export const VehicleTable = () => {
     editingRowIds = editingRowIds.filter((editingRowId) => editingRowId != id);
     await deleteVehicle(id as string);
     setRows(rows.filter((row) => row.id !== id));
+    setToastProps({
+      severity: "success",
+      message: userMessages.success.delete,
+    });
   };
 
  
@@ -206,6 +205,7 @@ export const VehicleTable = () => {
 
   const handleProcessRowUpdate = async (updatedRow: any, originalRow: any) => {
     if (updatedRow.isNew) {
+      if(!updatedRow.licensePlates) return;
       editingRowIds = editingRowIds.filter(
         (editingRowId) => editingRowId != updatedRow.id
       );
@@ -215,7 +215,7 @@ export const VehicleTable = () => {
         setRows(rows.map((row) => (row.id === updatedRow.id ? rowToAdd : row)));
         setToastProps({
           severity: "success",
-          message: "Unidad registrada exitosamente",
+          message: userMessages.success.create,
         });
         return rowToAdd;
       }
@@ -224,11 +224,17 @@ export const VehicleTable = () => {
 
     originalRow.insuranceCarrier = updatedRow.insurance.carrier;
     originalRow.insuranceNumber = updatedRow.insurance.number;
+
     editingRowIds = editingRowIds.filter(
       (editingRowId) => editingRowId != updatedRow.id
     );
     if (JSON.stringify(updatedRow) != JSON.stringify(originalRow)) {
       const updatedVehicle = await putVehicle(updatedRow.id, updatedRow);
+      if(updatedVehicle.vin)
+        setToastProps({
+          severity: "success",
+          message: userMessages.success.update,
+        });
 
       return {
         ...updatedVehicle,
@@ -239,15 +245,15 @@ export const VehicleTable = () => {
     return originalRow;
   };
   
-  const handleSearchClick = (value:string) => {
-    console.log(value)
-    loadVehicles(value);
+  const handleSearchClick = (searchProps: SearchProps) => {
+    loadVehicles(searchProps);
   }
+
   const handlePaginationModelChange = (model: GridPaginationModel) => {
     if (editingRowIds.length > 0) {
       setToastProps({
         severity: "info",
-        message: "Debe cancelar las filas en edición",
+        message: userMessages.info.closeEditings,
       });
       return;
     }
@@ -519,10 +525,8 @@ export const VehicleTable = () => {
   return (
     <div className="table container">
       <h1>Vehículos</h1>
-      
-      
-        <Stack spacing={2} sx={{ width: "100%", paddingBottom: 30 }}>
-          <Box sx={{ height: 500, width: "100%" }}>
+        <Stack spacing={2} sx={{ width: "100%", height: 600 }}>
+          <Box sx={{ height: "100%", width: "100%" }}>
             <DataGrid
               apiRef={gridApiRef}
               editMode="row"
@@ -531,7 +535,7 @@ export const VehicleTable = () => {
               onRowModesModelChange={handleRowModesModelChange}
               onRowEditStop={handleRowEditStop}
               columns={columns}
-              rowCount={paginatedVehicles?.totalVehicles}
+              rowCount={paginatedVehicles?.totalVehicles || 0}
               loading={
                 isLoading ||
                 isCreateLoading ||

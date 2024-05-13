@@ -5,6 +5,13 @@ import { GetAllVehiclesUseCase } from "../../../vehicles/use-cases/get-all-vehic
 import { GetAllVehiclesDto } from "../../../vehicles/domain/dtos/get-all-vehicles.dto";
 import { CustomError } from "../../../utils/custom-errors.util";
 
+export interface SearchProps {
+    query?: string;
+    filter?: string;
+    operator: string;
+    value: string;
+}
+
 export const useFetchVehicles = () => {
     const { paginatedVehicles, setPaginatedVehicles } = useContext<VehicleContextType>(
         VehicleContext
@@ -16,10 +23,13 @@ export const useFetchVehicles = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<Error>();
 
-    const loadVehicles = async (query?:string) =>{
+    const loadVehicles = async (searchProps?: SearchProps) =>{
         try{
             setIsLoading(true)
-            const [error, getAllVehiclesDto] = GetAllVehiclesDto.create({...paginationModel, query});
+            const [error, getAllVehiclesDto] = GetAllVehiclesDto.create({
+                ...paginationModel,
+                ...searchProps
+            });
    
             if(error) throw CustomError.dto(`GetAllVehiclesDto -> ${error}`);
 

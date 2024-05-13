@@ -9,7 +9,16 @@ export type VehicleContextType = {
 	setSelectedVehicle:(vehicleId: string) => void;
 	paginationModel: GridPaginationModel;
 	setPaginationModel: (paginationModel: GridPaginationModel)=> void;
+	searchProps: SearchProps;
+	setSearchProps: (searchProps: SearchProps) => void;
 };
+
+export interface SearchProps {
+    query?: string;
+    filter?: string;
+    operator: string;
+    value: string;
+}
 
 export const VehicleContext = createContext<VehicleContextType| null>(null);
 
@@ -20,6 +29,12 @@ const VehicleProvider = ({ children }: PropsWithChildren) => {
 		page: 0,
         pageSize: 5,
 	});
+	const [searchProps, setSearchProps] = useState<SearchProps>({
+		filter: "",
+		operator: "",
+		value: "",
+		query: "",
+	  });
 
 
     return (
@@ -31,6 +46,8 @@ const VehicleProvider = ({ children }: PropsWithChildren) => {
 				setSelectedVehicle,
 				paginationModel,
 				setPaginationModel,
+				searchProps,
+				setSearchProps
 			}}
 		>
 			{children}
