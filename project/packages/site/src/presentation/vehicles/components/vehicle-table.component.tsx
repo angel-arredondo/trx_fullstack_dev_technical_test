@@ -103,8 +103,10 @@ export const VehicleTable = () => {
 
   useEffect(() => {
     const { query, filter, operator, value } = searchProps;
-    if(!query && (!filter && !operator && !value))
+    if(!query && (!filter && !operator && !value)){
       loadVehicles();
+      return;
+    }
     loadVehicles(searchProps);
   }, [paginationModel]);
 

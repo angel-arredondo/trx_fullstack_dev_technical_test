@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { VehicleContext, VehicleContextType } from "../context/vehicle.context";
 import { TraxiApiVehicleRepository } from "../../../vehicles/infrastructure/repositories/traxi-api-vehicle.repository";
 import { GetAllVehiclesUseCase } from "../../../vehicles/use-cases/get-all-vehicles.use-case";
@@ -44,10 +44,6 @@ export const useFetchVehicles = () => {
             setIsLoading(false);
         }
     }
-
-    useEffect(()=>{
-        loadVehicles();
-    },[]);
 
     return {
         error,
