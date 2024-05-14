@@ -37,7 +37,7 @@ export const Map = () => {
   });
 
   return (
-    <MapContainer center={[19.43344, -99.133348]} zoom={15}>
+    <MapContainer center={[19.43344, -99.133348]} zoom={13}>
       <TileLayer url={import.meta.env.VITE_LEAFLET_URL} />
 
       {!isLoading &&
@@ -69,34 +69,36 @@ export const Map = () => {
             }}
           >
             <Popup>
-              <li>
-                <span>Status: </span>
-                {vehicle.status}
-              </li>
-              <li>
-                <span>Lat: </span>
-                {vehicle.position[0]}
-              </li>
-              <li>
-                <span>Lon: </span>
-                {vehicle.position[1]}
-              </li>
-              <li>
-                <span>Vin: </span>
-                {vehicle.vin}
-              </li>
-              <li>
-                <span>Marca: </span>
-                {vehicle.manufacturer}
-              </li>
-              <li>
-                <span>Modelo: </span>
-                {vehicle.model}
-              </li>
-              <li>
-                <span>Color: </span>
-                {vehicle.color}
-              </li>
+              <div className="map popup">
+                <li>
+                  <span>Status: </span>
+                  {vehicle.status}
+                </li>
+                <li>
+                  <span>Lat: </span>
+                  {vehicle.position[0]}
+                </li>
+                <li>
+                  <span>Lon: </span>
+                  {vehicle.position[1]}
+                </li>
+                <li>
+                  <span>Vin: </span>
+                  {vehicle.vin}
+                </li>
+                <li>
+                  <span>Marca: </span>
+                  {vehicle.manufacturer}
+                </li>
+                <li>
+                  <span>Modelo: </span>
+                  {vehicle.model}
+                </li>
+                <li>
+                  <span>Color: </span>
+                  {vehicle.color}
+                </li>
+              </div>
             </Popup>
           </Marker>
         );

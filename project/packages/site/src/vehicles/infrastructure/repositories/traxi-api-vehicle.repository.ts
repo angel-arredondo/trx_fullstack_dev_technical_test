@@ -42,9 +42,17 @@ export class TraxiApiVehicleRepository implements VehicleRepository {
 
     async getAll(getAllVehiclesDto: GetAllVehiclesDto): Promise<PaginatedVehiclesEntity> {
         const { page, limit, query } = getAllVehiclesDto;
+
+        let filterProps = "";
+        if(getAllVehiclesDto.filter){
+            const { filter, operator, value } = getAllVehiclesDto.filter;
+            filterProps =`&filter=${filter}&operator=${operator}&value=${value}`;
+        }
+
         const paginatedVehicles = await HttpClientAdapter.fetch(
-            `${import.meta.env.VITE_API}vehicles?limit=${limit}&page=${page}&query=${query}`
+            `${import.meta.env.VITE_API}vehicles?limit=${limit}&page=${page}&query=${query}${filterProps}`
         );
+
         return PaginatedVehiclesMapper.paginatedVehiclesEntityFromObject(paginatedVehicles);
     }
 

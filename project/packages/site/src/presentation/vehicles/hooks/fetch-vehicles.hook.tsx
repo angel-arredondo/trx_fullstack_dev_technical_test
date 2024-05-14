@@ -1,9 +1,16 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { VehicleContext, VehicleContextType } from "../context/vehicle.context";
 import { TraxiApiVehicleRepository } from "../../../vehicles/infrastructure/repositories/traxi-api-vehicle.repository";
 import { GetAllVehiclesUseCase } from "../../../vehicles/use-cases/get-all-vehicles.use-case";
 import { GetAllVehiclesDto } from "../../../vehicles/domain/dtos/get-all-vehicles.dto";
 import { CustomError } from "../../../utils/custom-errors.util";
+
+export interface SearchProps {
+    query?: string;
+    filter?: string;
+    operator: string;
+    value: string;
+}
 
 export const useFetchVehicles = () => {
     const { paginatedVehicles, setPaginatedVehicles } = useContext<VehicleContextType>(
@@ -16,10 +23,13 @@ export const useFetchVehicles = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<Error>();
 
-    const loadVehicles = async (query?:string) =>{
+    const loadVehicles = async (searchProps?: SearchProps) =>{
         try{
             setIsLoading(true)
-            const [error, getAllVehiclesDto] = GetAllVehiclesDto.create({...paginationModel, query});
+            const [error, getAllVehiclesDto] = GetAllVehiclesDto.create({
+                ...paginationModel,
+                ...searchProps
+            });
    
             if(error) throw CustomError.dto(`GetAllVehiclesDto -> ${error}`);
 
@@ -34,10 +44,6 @@ export const useFetchVehicles = () => {
             setIsLoading(false);
         }
     }
-
-    useEffect(()=>{
-        loadVehicles();
-    },[]);
 
     return {
         error,
