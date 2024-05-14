@@ -47,8 +47,8 @@ body {
 }
 
 .toolbar.buttons {
- width: 220px;
- justify-content: space-between;
+  width: 220px;
+  justify-content: space-between;
 }
 
 .toolbar.action-button {
@@ -87,7 +87,7 @@ body {
 }
 
 .toolbar.action-button:hover .badge {
-  background-color:rgba(192, 228, 252, 0.473);
+  background-color: rgba(192, 228, 252, 0.473);
   -webkit-transition: 0.3s;
   transition: 0.3s;
 }
@@ -103,14 +103,14 @@ body {
   bottom: 0;
   left: 0;
   right: 0;
-  display:flex;
+  display: flex;
   z-index: 2;
 }
 
 .toolbar.dialog-filter {
   height: 80px;
   width: 430px;
-  top:0;
+  top: 0;
   margin-top: 50px;
   margin-left: 10px;
   border: 1px solid #dbdada;
@@ -155,7 +155,6 @@ body {
   width: 70%;
   border: none;
   padding: 6px 10px;
-
   border-top-left-radius: 5px;
   border-bottom-left-radius: 5px;
   outline: none;
@@ -169,6 +168,7 @@ body {
   cursor: pointer;
   color: var(--primary);
   justify-content: center;
+  background-color: inherit;
 }
 
 .toolbar.cancel-icon {
@@ -190,7 +190,6 @@ body {
   background-color: white;
   align-items: end;
   justify-content: end;
-  
 }
 
 .toolbar.search-button:enabled:hover {
@@ -236,14 +235,46 @@ body {
   color: #535353;
 }
 
+@media screen and (max-width: 600px) {
+  .toolbar.dialog-filter {
+    height: 250px;
+    width: 290px;
+    display: flex;
+    flex-direction: column;
+    padding-block: 40px;
+    padding-inline-end: 0;
+    margin-left: 3px;
+  }
+  
+  .toolbar.dialog-filter .toolbar.cancel-icon {
+    position: absolute;
+    margin-bottom: 70px;
+    margin-right: 10px;
+  }
+
+  .toolbar.dialog-filter-filter {
+    margin-right: 24px;
+    width: 224px;
+  }
+
+  .toolbar.dialog-filter select {
+    width: 200px;
+    height: 30px;
+  }
+
+  .toolbar.dialog-filter input {
+    width: 185px;
+  }
+}
+
 .footer {
   font-family: monospace;
-  color:#535353;
+  color: #535353;
   text-align: center;
   padding: 20px;
   font-weight: bold;
 }
 
-.footer a{
+.footer a {
   text-decoration: none;
 }
